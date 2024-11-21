@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영화 상세 정보</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            background-color: #121212; 
+            color: #e0e0e0; 
+        }
+        .movie-container {
+            display: flex;
+            align-items: flex-start;
+            max-width: 800px;
+            background-color: #1e1e1e; 
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        .movie-poster {
+            width: 180px; 
+            height: auto;
+            border-radius: 8px;
+            margin-right: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+        }
+        .movie-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .movie-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff; 
+            margin-bottom: 10px;
+        }
+        .movie-info {
+            font-size: 14px;
+            color: #b3b3b3;
+            margin-bottom: 15px;
+        }
+        .movie-overview {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #cccccc;
+        }
+        .movie-info-section {
+            margin-bottom: 20px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #e50914; 
+        }
+    </style>
+</head>
+<body>
+    <div class="movie-container">
+        <img id="movie-poster" class="movie-poster" src="" alt="Movie Poster">
+        <div class="movie-details">
+            <div id="movie-title" class="movie-title">영화 제목</div>
+            <div class="movie-info">
+                <span id="movie-release-date" class="info-label">개봉일:</span> <span id="release-date-value"></span>
+                <br>
+                <span id="movie-rating" class="info-label">평점:</span> <span id="rating-value"></span>
+                <br>
+                <span id="movie-genres" class="info-label">장르:</span> <span id="genres-value"></span>
+            </div>
+            <div id="movie-overview" class="movie-overview movie-info-section">영화 줄거리...</div>
+        </div>
+    </div>
+
+    <script>
+        const movieId = {{ movie_id }};
+        const apiKey = '046cd9a228db2149662380384cae4622';
+        const movieUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=ko-KR`;
+
+        fetch(movieUrl)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('movie-poster').src = data.poster_path 
+                    ? `https://image.tmdb.org/t/p/w300${data.poster_path}`
+                    : 'https://via.placeholder.com/180x270?text=No+Image';
+                document.getElementById('movie-title').textContent = data.title;
+                document.getElementById('movie-overview').textContent = data.overview;
+                document.getElementById('release-date-value').textContent = data.release_date || 'N/A';
+                document.getElementById('rating-value').textContent = data.vote_average || 'N/A';
+                document.getElementById('genres-value').textContent = data.genres.map(genre => genre.name).join(', ') || 'N/A';
+            })
+            .catch(error => console.error('Error fetching movie details:', error));
+    </script>
+</body>
+</html>
