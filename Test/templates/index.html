@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilmMate</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #181818;
+            color: #ffffff;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+        #drawer-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        #logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-left: 10px;
+            cursor: pointer;
+            color: #e50914;
+            letter-spacing: 1px;
+        }
+        #drawer-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100%;
+            background-color: #181818;
+            color: #ffffff;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            padding-top: 70px;
+            z-index: 1100;
+        }
+        #drawer-menu.active {
+            transform: translateX(0);
+        }
+        #drawer-menu ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #drawer-menu li {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: background-color 0.3s;
+        }
+        #drawer-menu li:hover {
+            background-color: #333;
+        }
+        #search-container {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+        #search-bar {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px 0 0 5px;
+            border: none;
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+        }
+        #search-button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 0 5px 5px 0;
+            border: none;
+            background-color: #555;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #search-button:hover {
+            background-color: #777;
+        }
+        #login-button {
+            margin-left: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #e50914;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #login-button:hover {
+            background-color: #ff4c4c;
+        }
+        #main-content {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #f5f5f5;
+        }
+        #recommendation-container {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .movie-card {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+            color: #ffffff;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+            background-color: #333;
+        }
+        .movie-poster {
+            width: 100%;
+            max-width: 160px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.3s;
+        }
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #f5f5f5;
+        }
+        .movie-rating {
+            margin-top: 5px;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="drawer-button">☰</div>
+        <div id="logo">FilmMate</div>
+        <div id="search-container">
+            <input type="text" id="search-bar" placeholder="영화 검색..." />
+            <button id="search-button">검색</button>
+        </div>
+        <button id="login-button">로그인</button>
+    </header>
+    <div id="drawer-menu">
+        <ul id="genre-list"></ul>
+    </div>
+    <div id="main-content">
+        <h2>추천 영화</h2>
+        <div id="recommendation-container"></div>
+    </div>
+    <script>
+        const apiKey = '046cd9a228db2149662380384cae4622';
+        document.getElementById('logo').addEventListener('click', () => {
+            window.location.href = '/';
+        });
+        const drawerButton = document.getElementById('drawer-button');
+        const drawerMenu = document.getElementById('drawer-menu');
+        drawerButton.addEventListener('click', () => {
+            drawerMenu.classList.toggle('active');
+        });
+        document.addEventListener('click', (event) => {
+            if (!drawerMenu.contains(event.target) && !drawerButton.contains(event.target)) {
+                drawerMenu.classList.remove('active');
+            }
+        });
+        document.getElementById('search-button').addEventListener('click', searchMovies);
+        document.getElementById('search-bar').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                searchMovies();
+            }
+        });
+        function searchMovies() {
+            const query = document.getElementById('search-bar').value.trim();
+            if (query.length > 0) {
+                window.location.href = `/search/results/?query=${encodeURIComponent(query)}`;
+            }
+        }
+        document.getElementById('login-button').addEventListener('click', () => {
+            window.location.href = '/login/';
+        });
+        fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=ko-KR`)
+            .then(response => response.json())
+            .then(data => {
+                const genreList = document.getElementById('genre-list');
+                data.genres.forEach(genre => {
+                    const genreItem = document.createElement('li');
+                    genreItem.textContent = genre.name;
+                    genreItem.onclick = () => loadMoviesByGenre(genre.id, genre.name);
+                    genreList.appendChild(genreItem);
+                });
+            })
+            .catch(error => console.error('Error fetching genres:', error));
+        function loadMoviesByGenre(genreId, genreName) {
+            const recommendationContainer = document.getElementById('recommendation-container');
+            recommendationContainer.innerHTML = '';
+            document.querySelector('h2').textContent = `${genreName} 영화 추천`;
+            fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}&sort_by=popularity.desc&language=ko-KR`)
+                .then(response => response.json())
+                .then(data => {
+                    data.results.forEach(movie => {
+                        const movieCard = document.createElement('div');
+                        movieCard.classList.add('movie-card');
+                        movieCard.onclick = () => {
+                            window.location.href = `/movie/${movie.id}`;
+                        };
+                        const poster = document.createElement('img');
+                        poster.src = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
+                        poster.alt = `${movie.title} Poster`;
+                        poster.classList.add('movie-poster');
+                        const title = document.createElement('div');
+                        title.classList.add('movie-title');
+                        title.textContent = movie.title;
+                        const ratingContainer = document.createElement('div');
+                        ratingContainer.classList.add('movie-rating');
+                        const rating = Math.round(movie.vote_average) / 2;
+                        for (let i = 1; i <= 5; i++) {
+                            const star = document.createElement('span');
+                            star.textContent = i <= rating ? '★' : '☆';
+                            ratingContainer.appendChild(star);
+                        }
+                        movieCard.appendChild(poster);
+                        movieCard.appendChild(title);
+                        movieCard.appendChild(ratingContainer);
+                        recommendationContainer.appendChild(movieCard);
+                    });
+                })
+                .catch(error => console.error('Error fetching movies by genre:', error));
+        }
+        function loadDefaultMovies() {
+            const recommendationContainer = document.getElementById('recommendation-container');
+            recommendationContainer.innerHTML = '';
+            document.querySelector('h2').textContent = '추천 영화';
+            fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&page=1`)
+                .then(response => response.json())
+                .then(data => {
+                    data.results.slice(0, 15).forEach(movie => {
+                        const movieCard = document.createElement('div');
+                        movieCard.classList.add('movie-card');
+                        movieCard.onclick = () => {
+                            window.location.href = `/movie/${movie.id}`;
+                        };
+                        const poster = document.createElement('img');
+                        poster.src = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
+                        poster.alt = `${movie.title} Poster`;
+                        poster.classList.add('movie-poster');
+                        const title = document.createElement('div');
+                        title.classList.add('movie-title');
+                        title.textContent = movie.title;
+                        const ratingContainer = document.createElement('div');
+                        ratingContainer.classList.add('movie-rating');
+                        const rating = Math.round(movie.vote_average) / 2;
+                        for (let i = 1; i <= 5; i++) {
+                            const star = document.createElement('span');
+                            star.textContent = i <= rating ? '★' : '☆';
+                            ratingContainer.appendChild(star);
+                        }
+                        movieCard.appendChild(poster);
+                        movieCard.appendChild(title);
+                        movieCard.appendChild(ratingContainer);
+                        recommendationContainer.appendChild(movieCard);
+                    });
+                })
+                .catch(error => console.error('Error fetching default movies:', error));
+        }
+        loadDefaultMovies();
+    </script>
+</body>
+</html>

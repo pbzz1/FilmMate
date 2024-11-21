@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>로그인</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #e50914;
+            text-decoration: none;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+        .login-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        div {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #loginButton {
+            background-color: #e50914;
+            color: #fff;
+        }
+        #loginButton:hover {
+            background-color: #ff4c4c;
+        }
+        
+        .action-button {
+            background-color: #555;
+            color: #fff;
+            margin-top: 15px;
+        }
+        .action-button:hover {
+            background-color: #777;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .close-button {
+            background-color: #e50914;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .close-button:hover {
+            background-color: #ff4c4c;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="logo">FilmMate</a>
+    <div class="login-container">
+        <h1>로그인</h1>
+        <form>
+            <div> email : <input type="email" id="signInEmail" required /> </div>
+            <div> password : <input type="password" id="signInPassword" required /> </div>
+            <button type="submit" id="loginButton">로그인 하기</button>
+        </form>
+        <button class="action-button" onclick="openModal('signupModal')">회원가입 하러 가기</button>
+        <button class="action-button" onclick="openModal('googleLoginModal')">구글 아이디로 로그인</button>
+    </div>
+
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <h1>회원가입</h1>
+            <form>
+                <div> email : <input type="email" id="signUpEmail" required /> </div>
+                <div> password : <input type="password" id="signUpPassword" required /> </div>
+                <button type="submit" id="signUpButton">회원가입 하기</button>
+            </form>
+            <button class="close-button" onclick="closeModal('signupModal')">닫기</button>
+        </div>
+    </div>
+
+    <div id="googleLoginModal" class="modal">
+        <div class="modal-content">
+            <h1>구글 로그인</h1>
+            <button type="submit" id="signInGoogleButton">
+                <img src="./Google_logo.png" alt="Google Logo" style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;">
+                구글 아이디로 로그인 하기
+            </button>
+            <button type="submit" id="signOutGoogleButton">로그아웃 하기</button>
+            <button class="close-button" onclick="closeModal('googleLoginModal')">닫기</button>
+        </div>
+    </div>
+    
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const signupModal = document.getElementById('signupModal');
+            const googleLoginModal = document.getElementById('googleLoginModal');
+            if (event.target === signupModal) {
+                closeModal('signupModal');
+            } else if (event.target === googleLoginModal) {
+                closeModal('googleLoginModal');
+            }
+        };
+    </script>
+</body>
+</html>

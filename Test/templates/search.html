@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #121212; 
+            color: #e0e0e0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #181818; 
+            color: #fff;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+        #logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #search-container {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            margin-right: auto;
+        }
+        #search-bar {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px 0 0 5px;
+            border: none;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+        }
+        #search-bar::placeholder {
+            color: #aaa;
+        }
+        #search-button {
+            padding: 8px 15px;
+            font-size: 16px;
+            border-radius: 0 5px 5px 0;
+            border: none;
+            background-color: #e50914; 
+            color: #fff;
+            cursor: pointer;
+        }
+        #main-content {
+            width: 90%;
+            margin-top: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #recommendation-container {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 20px 0;
+        }
+        .movie-card {
+            background-color: #1e1e1e; 
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transition: transform 0.2s;
+            color: #fff;
+        }
+        .movie-card:hover {
+            transform: scale(1.05); 
+        }
+        .movie-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #fff;
+        }
+        .movie-poster {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="logo">MovieHub</div>
+        <div id="search-container">
+            <input type="text" id="search-bar" placeholder="Search for movies..." />
+            <button id="search-button">검색</button>
+        </div>
+    </header>
+
+    <div id="main-content">
+        <h2>Recommended Movies</h2>
+        <div id="recommendation-container">
+            
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('search-bar').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                searchMovies();
+            }
+        });
+
+        document.getElementById('search-button').addEventListener('click', searchMovies);
+
+        function searchMovies() {
+            const query = document.getElementById('search-bar').value.trim();
+            if (query.length > 0) {
+                window.location.href = `/search/results/?query=${encodeURIComponent(query)}`;
+            }
+        }
+
+        const apiKey = '046cd9a228db2149662380384cae4622';
+        const recommendationUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`;
+
+        fetch(recommendationUrl)
+            .then(response => response.json())
+            .then(data => {
+                const movies = data.results.slice(0, 15);
+                const recommendationContainer = document.getElementById('recommendation-container');
+                
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.classList.add('movie-card');
+                    
+                    const poster = document.createElement('img');
+                    poster.src = `https://image.tmdb.org/t/p/w200${movie.poster_path}`;
+                    poster.alt = `${movie.title} Poster`;
+                    poster.classList.add('movie-poster');
+
+                    const title = document.createElement('div');
+                    title.classList.add('movie-title');
+                    title.textContent = movie.title;
+
+                    movieCard.appendChild(poster);
+                    movieCard.appendChild(title);
+                    recommendationContainer.appendChild(movieCard);
+                });
+            })
+            .catch(error => console.error('Error fetching recommendations:', error));
+    </script>
+</body>
+</html>
