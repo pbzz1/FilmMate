@@ -8,7 +8,7 @@
 ![image](https://github.com/user-attachments/assets/b6a93151-0f7d-44f0-b68b-00d9633123fe)
 
 ## 2.사용 기술
-  ###-1.Flask를 이용한 서버구축
+  ### -1.Flask를 이용한 서버구축
 ![image](https://github.com/user-attachments/assets/e4685238-4262-4a6d-97a6-bd4161dbb534)
 
   ### -2.TMDB API
